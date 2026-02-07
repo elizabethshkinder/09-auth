@@ -1,7 +1,7 @@
-import { fetchNotes } from "@/lib/api/clientApi";;
+import { fetchNotes } from "@/lib/api/serverApi";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import NotesClient from "./Notes.client";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 type NotesByCategoryProps = {
   params: Promise<{ slug: string[] }>;
