@@ -1,7 +1,7 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { api } from "./api";
-import type { User } from "@/types/user";
 
+import type { User } from "@/types/user";
 import type { AxiosResponse } from "axios";
 import type { Note } from "@/types/note";
 
@@ -52,10 +52,20 @@ export async function fetchNoteById(id: string): Promise<Note> {
   return data;
 }
 
-export async function serverCheckSession(): Promise<AxiosResponse<{ success: boolean }>> {
-  const headersList = await headers();
-  const res = await api.get<{ success: boolean }>("/auth/session", { headers: Object.fromEntries(headersList) });
-  return res; 
+export async function serverCheckSession(): Promise<
+  AxiosResponse<{ success: boolean }>
+> {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join("; ");
+
+  const res = await api.get<{ success: boolean }>("/auth/session", {
+    headers: { Cookie: cookieHeader },
+  });
+
+  return res;
 }
 
 export async function serverGetMe(): Promise<User> {
