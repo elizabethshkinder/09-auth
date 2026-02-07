@@ -2,31 +2,34 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/lib/store/authStore";
-import { checkSession } from "@/lib/api/clientApi";
+import { checkSession, getMe } from "@/lib/api/clientApi";
 
-export default function AuthProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const setUser = useAuthStore((s) => s.setUser);
   const clearIsAuthenticated = useAuthStore((s) => s.clearIsAuthenticated);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function init() {
       try {
-        const user = await checkSession();
-        if (user) {
-          setUser(user);
-        } else {
-          clearIsAuthenticated();
+        const ok = await checkSession();
+        if (!ok) {
+          if (!cancelled) clearIsAuthenticated();
+          return;
         }
+
+        const me = await getMe();
+        if (!cancelled) setUser(me);
       } catch {
-        clearIsAuthenticated();
+        if (!cancelled) clearIsAuthenticated();
       }
     }
 
     init();
+    return () => {
+      cancelled = true;
+    };
   }, [setUser, clearIsAuthenticated]);
 
   return <>{children}</>;
