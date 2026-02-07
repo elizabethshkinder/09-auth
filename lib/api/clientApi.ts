@@ -27,15 +27,14 @@ export async function logout(): Promise<void> {
   await api.post("/auth/logout");
 }
 
-export async function checkSession(): Promise<User | null> {
+export async function checkSession(): Promise<boolean> {
   try {
-    const res = await api.get<User | null>("/auth/session");
-    return res.data ?? null;
+    const res = await api.get<{ success: boolean }>("/auth/session");
+    return Boolean(res.data?.success);
   } catch {
-    return null;
+    return false;
   }
 }
-
 
 export async function getMe(): Promise<User> {
   const res = await api.get<User>("/users/me");

@@ -1,15 +1,12 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 const privateRoutes = ["/profile", "/notes"];
 const publicRoutes = ["/sign-in", "/sign-up"];
 
 function hasAuthCookie(req: NextRequest) {
-  const cookies = req.cookies;
 
-  return (
-    cookies.has("accessToken") && cookies.has("refreshToken")
-  );
+  return req.cookies.has("accessToken") || req.cookies.has("refreshToken");
+  
 }
 
 export function proxy(req: NextRequest) {
